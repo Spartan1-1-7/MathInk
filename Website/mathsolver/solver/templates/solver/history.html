@@ -1,0 +1,137 @@
+{% extends 'solver/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <!-- Page Title -->
+        <div class="mb-4 text-center text-md-start">
+            <h2 class="display-6 fw-bold mb-3" style="color: var(--deep-blue);">
+                Your Equation <span style="color: var(--seafoam-green);">History</span>
+            </h2>
+            <p class="lead text-muted">View and manage all your previously solved equations</p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div class="mb-3 mb-md-0">
+                <span class="badge bg-light text-dark me-2 p-2">
+                    <i class="fas fa-calculator me-1" style="color: var(--seafoam-green);"></i> 
+                    Total Solved: <span class="fw-bold">{{ equations|length }}</span>
+                </span>
+            </div>
+            <div>
+                <a href="{% url 'solver:index' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Solve New Equation
+                </a>
+            </div>
+        </div>
+            
+        {% if equations %}
+            <!-- Equation History Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">
+                            <i class="fas fa-history me-2" style="color: var(--seafoam-green);"></i>
+                            Equation History
+                        </h3>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-filter me-1"></i> Filter
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#">All Equations</a></li>
+                                <li><a class="dropdown-item" href="#">Today</a></li>
+                                <li><a class="dropdown-item" href="#">This Week</a></li>
+                                <li><a class="dropdown-item" href="#">This Month</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>EQUATION</th>
+                                    <th>SOLUTION</th>
+                                    <th>IMAGE</th>
+                                    <th>ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for equation in equations %}
+                                <tr>
+                                    <td class="text-nowrap">
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold">{{ equation.created_at|date:"M d, Y" }}</span>
+                                            <small class="text-muted">{{ equation.created_at|date:"H:i" }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="font-monospace" style="max-width: 250px; overflow-x: auto;">{{ equation.equation_text }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="font-monospace" style="color: var(--deep-blue); max-width: 250px; overflow-x: auto;">{{ equation.solution }}</div>
+                                    </td>
+                                    <td>
+                                        {% if equation.image %}
+                                            <a href="{{ equation.image.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-image me-1"></i>View
+                                            </a>
+                                        {% else %}
+                                            <span class="badge bg-light text-muted">No image</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Equation actions">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-success" title="Export Solution">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center p-3">
+                    <div>
+                        <span class="text-muted small">Showing {{ equations|length }} equations</span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-danger me-2">
+                            <i class="fas fa-trash-alt me-1"></i>Clear All
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Export All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty State Card -->
+            <div class="card">
+                <div class="card-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="fas fa-history fa-4x" style="color: var(--light-blue);"></i>
+                    </div>
+                    <h3 class="h4 mb-3" style="color: var(--deep-blue);">No equations solved yet</h3>
+                    <p class="text-muted mb-4">You haven't solved any equations yet. Upload an image on the home page to get started.</p>
+                    <a href="{% url 'solver:index' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-calculator me-2"></i>Solve Your First Equation
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

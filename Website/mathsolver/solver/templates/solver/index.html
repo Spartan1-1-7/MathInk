@@ -1,0 +1,314 @@
+{% extends 'solver/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <!-- Welcome Banner -->
+        <div class="card mb-5 border-0 bg-transparent shadow-none">
+            <div class="card-body text-center p-5">
+                <h2 class="display-5 fw-bold mb-4" style="color: var(--deep-blue);">
+                    Smart Math Solutions <span style="color: var(--seafoam-green);">in Seconds</span>
+                </h2>
+                <p class="lead mb-4 mx-auto" style="max-width: 700px;">
+                    Take a photo of any math equation and let our AI solve it for you with detailed step-by-step explanations.
+                </p>
+                <div class="d-flex justify-content-center">
+                    <div class="badge bg-light text-dark me-2 p-2">
+                        <i class="fas fa-check-circle me-1" style="color: var(--seafoam-green);"></i> Algebra
+                    </div>
+                    <div class="badge bg-light text-dark me-2 p-2">
+                        <i class="fas fa-check-circle me-1" style="color: var(--seafoam-green);"></i> Calculus
+                    </div>
+                    <div class="badge bg-light text-dark p-2">
+                        <i class="fas fa-check-circle me-1" style="color: var(--seafoam-green);"></i> Polynomials
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Equation Upload Card -->
+        <div class="card mb-5">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="pe-lg-4">
+                            <h3 class="h4 mb-3" style="color: var(--deep-blue);">How It Works</h3>
+                            <ul class="list-unstyled">
+                                <li class="d-flex align-items-start mb-3">
+                                    <div class="d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background-color: var(--light-blue); border-radius: 50%; color: var(--deep-blue); font-weight: bold;">1</div>
+                                    <div>
+                                        <strong class="d-block mb-1">Upload an image</strong>
+                                        <span class="text-muted">Take a photo of your equation or upload from your device</span>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-start mb-3">
+                                    <div class="d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background-color: var(--light-blue); border-radius: 50%; color: var(--deep-blue); font-weight: bold;">2</div>
+                                    <div>
+                                        <strong class="d-block mb-1">AI processes the equation</strong>
+                                        <span class="text-muted">Our OCR technology extracts the math expression</span>
+                                    </div>
+                                </li>
+                                <li class="d-flex align-items-start">
+                                    <div class="d-flex align-items-center justify-content-center me-3" style="width: 36px; height: 36px; background-color: var(--light-blue); border-radius: 50%; color: var(--deep-blue); font-weight: bold;">3</div>
+                                    <div>
+                                        <strong class="d-block mb-1">Get step-by-step solution</strong>
+                                        <span class="text-muted">Review detailed explanations of each step</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-7 mt-4 mt-lg-0">
+                        <form id="equationForm" class="mb-4">
+                            <h3 class="h4 mb-3" style="color: var(--deep-blue);">Upload Your Equation</h3>
+                            
+                            <div class="dropzone mb-3" id="dropZone">
+                                <div class="text-center py-3">
+                                    <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: var(--seafoam-green);"></i>
+                                    <p class="mb-1">Drag & drop or click to browse</p>
+                                    <small class="text-muted d-block mb-3">Supported formats: JPG, PNG, GIF (max 5MB)</small>
+                                    <input class="form-control visually-hidden" type="file" id="equationImage" accept="image/*" required>
+                                    <button type="button" class="btn btn-outline-primary px-4" id="browseBtn">
+                                        <i class="fas fa-image me-2"></i>Select Image
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="uploadPreview" class="text-center mb-3" style="display: none;">
+                                <h5 class="mb-3 text-muted">Preview</h5>
+                                <div class="position-relative d-inline-block">
+                                    <img id="previewImage" src="#" alt="Equation preview" class="img-fluid rounded mb-3" style="max-height: 200px;">
+                                    <button type="button" class="position-absolute top-0 end-0 btn btn-sm btn-danger rounded-circle" id="removePreview" style="margin-top: -10px; margin-right: -10px;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <i class="fas fa-calculator me-2"></i>Solve Equation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Card (Hidden Initially) -->
+        <div id="resultsCard" class="card mb-5" style="display: none;">
+            <div class="card-header bg-success text-white">
+                <h2 class="h4 mb-0">Solution</h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="badge bg-success p-2 mb-3">
+                        <i class="fas fa-check-circle me-1"></i> Successfully Solved
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <h5 class="mb-3">
+                            <i class="fas fa-pencil-alt me-2" style="color: var(--deep-blue);"></i>
+                            Detected Equation:
+                        </h5>
+                        <div id="detectedEquation" class="font-monospace fs-5"></div>
+                    </div>
+                    <div class="col-md-7">
+                        <h5 class="mb-3">
+                            <i class="fas fa-equals me-2" style="color: var(--seafoam-green);"></i>
+                            Solution:
+                        </h5>
+                        <div id="equationSolution" class="font-monospace fs-5"></div>
+                    </div>
+                </div>
+                
+                <div class="mb-0">
+                    <h5 class="mb-3">
+                        <i class="fas fa-list-ol me-2" style="color: var(--deep-blue);"></i>
+                        Step-by-Step Explanation:
+                    </h5>
+                    <div id="solutionSteps"></div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary me-2" id="solveAnotherBtn">
+                        <i class="fas fa-redo me-2"></i>Solve Another
+                    </button>
+                    <button class="btn btn-outline-success" id="downloadSolutionBtn">
+                        <i class="fas fa-download me-2"></i>Save Solution
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator (Hidden Initially) -->
+        <div id="loadingIndicator" class="text-center p-5" style="display: none;">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Processing your equation...</p>
+            <div class="progress mt-3" style="height: 10px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%; background-color: var(--seafoam-green);" id="processingProgress"></div>
+            </div>
+        </div>
+
+        <!-- Error Alert (Hidden Initially) -->
+        <div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-exclamation-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading">Processing Error</h5>
+                    <span id="errorMessage">An error occurred</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Equations -->
+        {% if recent_equations %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="h5 mb-0">
+                    <i class="fas fa-history me-2" style="color: var(--seafoam-green);"></i>
+                    Recently Solved Equations
+                </h3>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for equation in recent_equations %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="font-monospace">{{ equation.equation_text }}</div>
+                                <div class="d-flex align-items-center mt-1">
+                                    <i class="fas fa-arrow-right me-2" style="color: var(--seafoam-green);"></i>
+                                    <div class="font-monospace" style="color: var(--deep-blue);">{{ equation.solution }}</div>
+                                </div>
+                            </div>
+                            <small class="text-muted ms-3">{{ equation.created_at|date:"M d, Y" }}</small>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{% url 'solver:history' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>View All History
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // This will be included on the index page, but we're keeping the main logic in main.js
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the form and preview functionality
+        initEquationSolver();
+        
+        // Handle browse button click
+        const browseBtn = document.getElementById('browseBtn');
+        const equationImage = document.getElementById('equationImage');
+        
+        if (browseBtn) {
+            browseBtn.addEventListener('click', function() {
+                equationImage.click();
+            });
+        }
+        
+        // Handle drag and drop
+        const dropZone = document.getElementById('dropZone');
+        
+        if (dropZone) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropZone.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropZone.classList.remove('dragover');
+            }
+            
+            dropZone.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    equationImage.files = files;
+                    const event = new Event('change');
+                    equationImage.dispatchEvent(event);
+                }
+            }
+        }
+        
+        // Handle solve another button
+        const solveAnotherBtn = document.getElementById('solveAnotherBtn');
+        if (solveAnotherBtn) {
+            solveAnotherBtn.addEventListener('click', function() {
+                const resultsCard = document.getElementById('resultsCard');
+                const uploadPreview = document.getElementById('uploadPreview');
+                const removePreview = document.getElementById('removePreview');
+                
+                if (resultsCard) {
+                    resultsCard.style.display = 'none';
+                }
+                
+                if (removePreview) {
+                    const event = new Event('click');
+                    removePreview.dispatchEvent(event);
+                }
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+        
+        // Simulate progress bar movement during processing
+        const processingProgress = document.getElementById('processingProgress');
+        window.simulateProgress = function() {
+            if (processingProgress) {
+                let width = 0;
+                const interval = setInterval(function() {
+                    if (width >= 90) {
+                        clearInterval(interval);
+                    } else {
+                        width += Math.random() * 15;
+                        if (width > 90) width = 90;
+                        processingProgress.style.width = width + '%';
+                    }
+                }, 300);
+                
+                return function() {
+                    clearInterval(interval);
+                    processingProgress.style.width = '100%';
+                };
+            }
+            return function() {};
+        };
+    });
+</script>
+{% endblock %}
